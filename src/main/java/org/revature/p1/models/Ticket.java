@@ -1,4 +1,4 @@
-package org.revature.p1;
+package org.revature.p1.models;
 
 import org.revature.p1.utils.enums.TicketStatus;
 import org.revature.p1.utils.exceptions.TicketInvalidAmountException;

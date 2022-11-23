@@ -1,5 +1,8 @@
 package org.revature.p1;
 
+import org.revature.p1.models.Ticket;
+import org.revature.p1.utils.exceptions.TicketInvalidAmountException;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
