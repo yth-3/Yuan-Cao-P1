@@ -1,5 +1,8 @@
 package org.revature.p1;
 
+import org.revature.p1.utils.enums.TicketStatus;
+import org.revature.p1.utils.exceptions.TicketInvalidAmountException;
+
 public class Ticket {
     private TicketStatus status;
     private String description;
