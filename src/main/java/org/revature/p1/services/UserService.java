@@ -5,11 +5,11 @@ import org.revature.p1.dtos.requests.LoginRequest;
 import org.revature.p1.dtos.requests.RegistrationRequest;
 import org.revature.p1.dtos.responses.Principal;
 import org.revature.p1.models.User;
-import org.revature.p1.utils.enums.ClientUserType;
 import org.revature.p1.utils.exceptions.DuplicateUserException;
 import org.revature.p1.utils.exceptions.InvalidLoginException;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class UserService {
     private final UserDao userDao;
@@ -43,6 +43,10 @@ public class UserService {
                 throw new DuplicateUserException();
             }
         }
+    }
+
+    public List<User> getAllUsers() {
+        return userDao.findAll();
     }
 
     // Helper Functions

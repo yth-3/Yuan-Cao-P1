@@ -1,9 +1,11 @@
 package org.revature.p1.services;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.revature.p1.dtos.responses.Principal;
 import org.revature.p1.utils.JwtConfig;
+import org.revature.p1.utils.enums.ClientUserType;
 
 import java.util.Date;
 
@@ -26,5 +28,22 @@ public class TokenService {
                 .signWith(jwtConfig.getAlgorithm(), jwtConfig.getSigningKey());
 
         return builder.compact();
+    }
+
+    public Principal extractPrincipal(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(jwtConfig.getSigningKey())
+                    .parseClaimsJws(token)
+                    .getBody();
+            return new Principal(claims.getId(),
+                                 claims.getSubject(),
+                                 ClientUserType.valueOf(claims.get("role", String.class)),
+                                 false,
+                                 claims.getIssuedAt().getTime(),
+                                 claims.getExpiration().getTime());
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
