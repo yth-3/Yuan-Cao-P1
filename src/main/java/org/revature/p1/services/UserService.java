@@ -2,6 +2,7 @@ package org.revature.p1.services;
 
 import org.revature.p1.daos.UserDao;
 import org.revature.p1.dtos.requests.AccountActivationRequest;
+import org.revature.p1.dtos.requests.AccountDeactivationRequest;
 import org.revature.p1.dtos.requests.LoginRequest;
 import org.revature.p1.dtos.requests.RegistrationRequest;
 import org.revature.p1.dtos.responses.Principal;
@@ -54,10 +55,15 @@ public class UserService {
         userDao.activateUser(req.getId());
     }
 
+    public void deactivateUser(AccountDeactivationRequest req) {
+        userDao.deactivateUser(req.getId());
+    }
+
     // Helper Functions
     private boolean isGoodCandidate(User user) {
         // TODO: Implement more checks if there is time
         // TODO: Assess if need to refactor to an util class
         return true;
     }
+
 }

@@ -105,4 +105,16 @@ public class UserDao implements CrudDao<User> {
             e.printStackTrace();
         }
     }
+
+    public void deactivateUser(String id) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE ers_users SET is_active = FALSE WHERE user_id = ?"
+            );
+            ps.setString(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
