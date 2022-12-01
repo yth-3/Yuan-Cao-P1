@@ -3,6 +3,7 @@ package org.revature.p1.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
 import org.revature.p1.daos.UserDao;
+import org.revature.p1.handlers.ActivateUserHandler;
 import org.revature.p1.handlers.GetUsersHandler;
 import org.revature.p1.handlers.LoginHandler;
 import org.revature.p1.handlers.RegistrationHandler;
@@ -32,6 +33,9 @@ public class Router {
         // Get Users
         GetUsersHandler getUsersHandler = new GetUsersHandler(mapper, userService, tokenService);
 
+        // Activate/deactivate user
+        ActivateUserHandler activateUserHandler = new ActivateUserHandler(mapper, userService, tokenService);
+
         app.routes(() -> {
             path("/auth", () -> {
                 // Login
@@ -44,6 +48,10 @@ public class Router {
 
                 // Fetch List
                 get(getUsersHandler::getUsers);
+
+                // Activate/Deactivate Account
+                put("/activate", activateUserHandler::activateUser);
+
             });
 
         });

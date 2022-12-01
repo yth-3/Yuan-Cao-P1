@@ -1,6 +1,7 @@
 package org.revature.p1.services;
 
 import org.revature.p1.daos.UserDao;
+import org.revature.p1.dtos.requests.AccountActivationRequest;
 import org.revature.p1.dtos.requests.LoginRequest;
 import org.revature.p1.dtos.requests.RegistrationRequest;
 import org.revature.p1.dtos.responses.Principal;
@@ -47,6 +48,10 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userDao.findAll();
+    }
+
+    public void activateUser(AccountActivationRequest req) {
+        userDao.activateUser(req.getId());
     }
 
     // Helper Functions

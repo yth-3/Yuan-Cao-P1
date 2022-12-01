@@ -19,7 +19,7 @@ public class UserDao implements CrudDao<User> {
         Connection con = ConnectionFactory.getInstance().getConnection();
         PreparedStatement ps = con.prepareStatement(
                 "insert into ERS_USERS(user_id, username, email, password, given_name, surname, is_active, role_id) " +
-                "values (?, ?, ?, ?, ?, ?, false, ?);");
+                        "values (?, ?, ?, ?, ?, ?, false, ?);");
         ps.setString(1, uuidString);
         ps.setString(2, obj.getUsername());
         ps.setString(3, obj.getEmail());
@@ -92,5 +92,17 @@ public class UserDao implements CrudDao<User> {
             e.printStackTrace();
         }
         return user;
+    }
+
+    public void activateUser(String id) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE ers_users SET is_active = TRUE WHERE user_id = ?"
+            );
+            ps.setString(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
