@@ -27,7 +27,9 @@ public class DeactivateUserHandler {
         try {
             String token = ctx.req.getHeader("Authorization");
             Principal principal = tokenService.extractPrincipal(token);
-            if (principal.getType() == ClientUserType.EMPLOYEE || principal.getType() == ClientUserType.MANAGER) {
+            if (principal == null
+                    || principal.getType() == ClientUserType.EMPLOYEE
+                    || principal.getType() == ClientUserType.MANAGER) {
                 ctx.status(401);
                 return;
             }

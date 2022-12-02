@@ -2,8 +2,10 @@ package org.revature.p1.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
+import org.revature.p1.daos.TicketDao;
 import org.revature.p1.daos.UserDao;
 import org.revature.p1.handlers.*;
+import org.revature.p1.services.TicketService;
 import org.revature.p1.services.TokenService;
 import org.revature.p1.services.UserService;
 
@@ -20,6 +22,9 @@ public class Router {
         UserDao userDao = new UserDao();
         UserService userService = new UserService(userDao);
 
+        // Set Up TicketService
+        TicketDao ticketDao = new TicketDao();
+        TicketService ticketService = new TicketService(ticketDao);
 
         // Login
         LoginHandler loginHandler = new LoginHandler(mapper, userService, tokenService);
@@ -33,6 +38,12 @@ public class Router {
         // Activate/deactivate user
         ActivateUserHandler activateUserHandler = new ActivateUserHandler(mapper, userService, tokenService);
         DeactivateUserHandler deactivateUserHandler = new DeactivateUserHandler(mapper, userService, tokenService);
+
+        // User Ticket Management
+        CreateTicketHandler createTicketHandler = new CreateTicketHandler(mapper, ticketService, tokenService);
+
+        // Manager Ticket Managment
+        GetPendingTicketsHandler getPendingTickets = new GetPendingTicketsHandler(mapper, ticketService, tokenService);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -52,6 +63,13 @@ public class Router {
                 put("/deactivate", deactivateUserHandler::deactivateUser);
             });
 
+            path("/tickets", () -> {
+                // Employee Ticket Management
+                post(createTicketHandler::createTicket);
+
+                // Manager Ticket Management
+                get("/manager/pending", getPendingTicketsHandler::getPendingTickets);
+            });
         });
 
     }
