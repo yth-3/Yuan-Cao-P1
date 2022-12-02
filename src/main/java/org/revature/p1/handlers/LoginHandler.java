@@ -27,6 +27,7 @@ public class LoginHandler {
         Principal principal;
         try {
             principal = userService.loginUser(req);
+            System.out.println(principal.toString());
         } catch (InvalidLoginException e) {
             ctx.status(401);
             return;

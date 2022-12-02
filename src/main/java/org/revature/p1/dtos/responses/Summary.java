@@ -4,7 +4,7 @@ import org.revature.p1.models.User;
 import org.revature.p1.utils.enums.TicketStatus;
 import org.revature.p1.utils.enums.TicketType;
 
-public class TicketStub {
+public class Summary {
     private String id;
     private User issuer;
     private long submitDate;
@@ -17,21 +17,21 @@ public class TicketStub {
     private TicketStatus status;
     private TicketType type;
 
-    public TicketStub() {
+    public Summary() {
         super();
     }
 
-    public TicketStub(String id,
-                      User issuer,
-                      long submitDate,
-                      User resolver,
-                      long resolveDate,
-                      String description,
-                      double amount,
-                      byte[] receipt,
-                      String paymentId,
-                      TicketStatus status,
-                      TicketType type) {
+    public Summary(String id,
+                   User issuer,
+                   long submitDate,
+                   User resolver,
+                   long resolveDate,
+                   String description,
+                   double amount,
+                   byte[] receipt,
+                   String paymentId,
+                   TicketStatus status,
+                   TicketType type) {
         this.id = id;
         this.issuer = issuer;
         this.submitDate = submitDate;

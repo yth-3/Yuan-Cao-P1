@@ -46,4 +46,22 @@ public class TokenService {
             return null;
         }
     }
+
+    public ClientUserType extractUserType(String token) {
+        Principal principal = extractPrincipal(token);
+        if (principal == null) {
+            return null;
+        } else {
+            return principal.getType();
+        }
+    }
+
+    public String extractUserId(String token) {
+        Principal principal = extractPrincipal(token);
+        if (principal == null) {
+            return null;
+        } else {
+            return principal.getId();
+        }
+    }
 }

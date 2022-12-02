@@ -43,7 +43,8 @@ public class Router {
         CreateTicketHandler createTicketHandler = new CreateTicketHandler(mapper, ticketService, tokenService);
 
         // Manager Ticket Managment
-        GetPendingTicketsHandler getPendingTickets = new GetPendingTicketsHandler(mapper, ticketService, tokenService);
+        GetPendingTicketsHandler getPendingTicketsHandler = new GetPendingTicketsHandler(mapper, ticketService, tokenService);
+        ApproveTicketHandler approveTicketHandler = new ApproveTicketHandler(mapper, ticketService, tokenService);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -69,6 +70,8 @@ public class Router {
 
                 // Manager Ticket Management
                 get("/manager/pending", getPendingTicketsHandler::getPendingTickets);
+                put("/manager/approve", approveTicketHandler::approveTicket);
+//                put("/manager/deny", denyTicketHandler::denyTicket);
             });
         });
 

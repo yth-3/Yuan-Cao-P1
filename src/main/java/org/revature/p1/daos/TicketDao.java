@@ -1,48 +1,110 @@
 package org.revature.p1.daos;
 
 import org.revature.p1.models.Ticket;
+import org.revature.p1.models.TicketStub;
+import org.revature.p1.models.User;
 import org.revature.p1.utils.ConnectionFactory;
+import org.revature.p1.utils.enums.TicketStatus;
+import org.revature.p1.utils.enums.TicketType;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class TicketDao implements CrudDao<Ticket> {
+public class TicketDao implements CrudDao<TicketStub> {
     @Override
-    public void create(Ticket obj) throws SQLException{
+    public void create(TicketStub obj) throws SQLException{
         Connection con = ConnectionFactory.getInstance().getConnection();
         PreparedStatement ps = con.prepareStatement(
                 "INSERT INTO ers_reimbursements (REIMB_ID, AMOUNT, SUBMITTED, DESCRIPTION, AUTHOR_ID, STATUS_ID, TYPE_ID) " +
                         "VALUES (?, ?, current_timestamp, ?, ?, 'PENDING', ?)"
         );
-        ps.setString(1, "SOME UNIQUE ID"); // need to generate id
+
+        String uuidString = UUID.nameUUIDFromBytes((obj.getDescription() + obj.getSubmitterId() + "DEADBEEF").getBytes()).toString();
+
+        ps.setString(1, uuidString); // need to generate id
         ps.setDouble(2, Double.valueOf(obj.getAmount()));
         ps.setString(3, obj.getDescription());
         ps.setString(4, obj.getSubmitterId());
         ps.setString(5, obj.getType().toString());
         ps.executeUpdate();
-
-        System.out.println("GOT HERE");
     }
 
     @Override
-    public Ticket read(Ticket obj) {
+    public TicketStub read(TicketStub obj) {
         return null;
     }
 
     @Override
-    public void update(Ticket obj) {
+    public void update(TicketStub obj) {
 
     }
 
     @Override
-    public void delete(Ticket obj) {
+    public void delete(TicketStub obj) {
 
     }
 
     @Override
-    public List<Ticket> findAll() {
+    public List<TicketStub> findAll() {
         return null;
+    }
+
+    public List<Ticket> findAllPending() {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE status_id = 'PENDING';");
+            ResultSet rs = ps.executeQuery();
+
+            List<Ticket> tickets = new ArrayList<>();
+            while (rs.next()) {
+                Ticket ticket = new Ticket();
+
+                ticket.setId(rs.getString("reimb_id"));
+                ticket.setAmount(rs.getDouble("amount"));
+                ticket.setSubmitDate(rs.getTimestamp("submitted").getTime());
+
+                if (rs.getTimestamp("resolved") != null) {
+                    ticket.setResolveDate(rs.getTimestamp("resolved").getTime());
+                }
+                ticket.setDescription(rs.getString("description"));
+                ticket.setReceipt(rs.getBytes("receipt"));
+                ticket.setPaymentId(rs.getString("payment_id"));
+
+                User issuer = new User();
+                issuer.setId(rs.getString("author_id"));
+                ticket.setIssuer(issuer);
+
+                System.out.println(rs.getString("resolver_id")); // Deal with this better
+                User resolver = new User();
+                ticket.setResolver(resolver);
+                ticket.setStatus(TicketStatus.PENDING);
+                ticket.setType(TicketType.valueOf(rs.getString("type_id")));
+
+                tickets.add(ticket);
+            }
+            return tickets;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void approveTicket(String ticketId, String userId) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE ers_reimbursements " +
+                            "SET " +
+                            "status_id = 'APPROVED', " +
+                            "resolver_id = ? " +
+                            "WHERE reimb_id = ? AND status_id = 'PENDING'"
+            );
+
+            ps.setString(1, userId);
+            ps.setString(2, ticketId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

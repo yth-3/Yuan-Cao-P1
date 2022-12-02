@@ -1,11 +1,14 @@
 package org.revature.p1.services;
 
 import org.revature.p1.daos.TicketDao;
+import org.revature.p1.dtos.requests.ApproveTicketRequest;
 import org.revature.p1.dtos.requests.TicketCreationRequest;
 import org.revature.p1.models.Ticket;
+import org.revature.p1.models.TicketStub;
 import org.revature.p1.utils.enums.TicketType;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class TicketService {
     private TicketDao ticketDao;
@@ -15,8 +18,16 @@ public class TicketService {
     }
 
     public void createTicket(TicketCreationRequest req, String id) throws SQLException {
-        Ticket ticket = new Ticket(id, req.getAmount(), req.getDescription(), TicketType.valueOf(req.getType()));
+        TicketStub ticketStub = new TicketStub(id, req.getAmount(), req.getDescription(), TicketType.valueOf(req.getType()));
         // Fill in info from req and id
-        this.ticketDao.create(ticket);
+        this.ticketDao.create(ticketStub);
+    }
+
+    public List<Ticket> getAllTickets() {
+        return this.ticketDao.findAllPending();
+    }
+
+    public void approveTicket(ApproveTicketRequest req, String userId) {
+        ticketDao.approveTicket(req.getTicketId(), userId);
     }
 }
