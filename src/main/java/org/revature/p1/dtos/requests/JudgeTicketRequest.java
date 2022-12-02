@@ -1,13 +1,13 @@
 package org.revature.p1.dtos.requests;
 
-public class ApproveTicketRequest {
+public class JudgeTicketRequest {
     private String ticketId;
 
-    public ApproveTicketRequest() {
+    public JudgeTicketRequest() {
         super();
     }
 
-    public ApproveTicketRequest(String ticketId) {
+    public JudgeTicketRequest(String ticketId) {
         this.ticketId = ticketId;
     }
 

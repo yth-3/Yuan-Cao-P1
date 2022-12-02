@@ -7,18 +7,18 @@ import org.revature.p1.services.TicketService;
 import org.revature.p1.services.TokenService;
 import org.revature.p1.utils.enums.ClientUserType;
 
-public class ApproveTicketHandler {
+public class DenyTicketHandler {
     private ObjectMapper mapper;
     private TicketService ticketService;
-    private  TokenService tokenService;
+    private TokenService tokenService;
 
-    public ApproveTicketHandler(ObjectMapper mapper, TicketService ticketService, TokenService tokenService) {
+    public DenyTicketHandler(ObjectMapper mapper, TicketService ticketService, TokenService tokenService) {
         this.mapper = mapper;
         this.ticketService = ticketService;
         this.tokenService = tokenService;
     }
 
-    public void approveTicket(Context ctx) {
+    public void denyTicket(Context ctx) {
         try {
             String token = ctx.req.getHeader("Authorization");
             ClientUserType userType = tokenService.extractUserType(token);
@@ -28,7 +28,7 @@ public class ApproveTicketHandler {
                 return;
             }
             JudgeTicketRequest req = mapper.readValue(ctx.req.getInputStream(), JudgeTicketRequest.class);
-            ticketService.approveTicket(req, userId);
+            ticketService.denyTicket(req, userId);
             ctx.status(200);
         } catch (Exception e) {
             e.printStackTrace();

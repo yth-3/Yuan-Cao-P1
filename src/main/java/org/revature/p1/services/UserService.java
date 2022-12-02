@@ -22,7 +22,7 @@ public class UserService {
 
     public Principal loginUser(LoginRequest req) {
         User user = userDao.getUserById(req.getUsername(), req.getPassword());
-        if (user == null || !user.isActive()) {
+        if (user == null || !user.isActive()) { // TODO: Add more checks - e.g. see if out of authorized time period
             throw new InvalidLoginException("Invalid username or password.");
         }
 

@@ -104,7 +104,25 @@ public class TicketDao implements CrudDao<TicketStub> {
             ps.setString(2, ticketId);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+    }
+
+    public void denyTicket(String ticketId, String userId) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE ers_reimbursements " +
+                            "SET " +
+                            "status_id = 'DENIED', " +
+                            "resolver_id = ? " +
+                            "WHERE reimb_id = ? AND status_id = 'PENDING'"
+            );
+
+            ps.setString(1, userId);
+            ps.setString(2, ticketId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

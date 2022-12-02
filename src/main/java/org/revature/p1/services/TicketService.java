@@ -1,7 +1,7 @@
 package org.revature.p1.services;
 
 import org.revature.p1.daos.TicketDao;
-import org.revature.p1.dtos.requests.ApproveTicketRequest;
+import org.revature.p1.dtos.requests.JudgeTicketRequest;
 import org.revature.p1.dtos.requests.TicketCreationRequest;
 import org.revature.p1.models.Ticket;
 import org.revature.p1.models.TicketStub;
@@ -27,7 +27,11 @@ public class TicketService {
         return this.ticketDao.findAllPending();
     }
 
-    public void approveTicket(ApproveTicketRequest req, String userId) {
+    public void approveTicket(JudgeTicketRequest req, String userId) {
         ticketDao.approveTicket(req.getTicketId(), userId);
+    }
+
+    public void denyTicket(JudgeTicketRequest req, String userId) {
+        ticketDao.denyTicket(req.getTicketId(), userId);
     }
 }
