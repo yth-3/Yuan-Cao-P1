@@ -6,6 +6,7 @@ import org.revature.p1.models.User;
 import org.revature.p1.utils.ConnectionFactory;
 import org.revature.p1.utils.enums.TicketStatus;
 import org.revature.p1.utils.enums.TicketType;
+import org.revature.p1.utils.exceptions.AttemptUpdatingFinalizedTicketException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -75,9 +76,61 @@ public class TicketDao implements CrudDao<TicketStub> {
                 issuer.setId(rs.getString("author_id"));
                 ticket.setIssuer(issuer);
 
-                System.out.println(rs.getString("resolver_id")); // Deal with this better
+                // Deal with getting the resolver better; not really handled atm
+                rs.getString("resolver_id");
                 User resolver = new User();
                 ticket.setResolver(resolver);
+
+                ticket.setStatus(TicketStatus.PENDING);
+                ticket.setType(TicketType.valueOf(rs.getString("type_id")));
+
+                tickets.add(ticket);
+            }
+            return tickets;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Ticket> findAllPreviousTicketsByStatus(String userId, TicketStatus status) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps;
+            if (status == null) {
+                ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE author_id = ?");
+                ps.setString(1, userId);
+            } else {
+                ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE author_id = ? AND status_id = ?");
+                ps.setString(1, userId);
+                ps.setString(2, status.toString());
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            List<Ticket> tickets = new ArrayList<>();
+            while (rs.next()) {
+                Ticket ticket = new Ticket();
+
+                ticket.setId(rs.getString("reimb_id"));
+                ticket.setAmount(rs.getDouble("amount"));
+                ticket.setSubmitDate(rs.getTimestamp("submitted").getTime());
+
+                if (rs.getTimestamp("resolved") != null) {
+                    ticket.setResolveDate(rs.getTimestamp("resolved").getTime());
+                }
+                ticket.setDescription(rs.getString("description"));
+                ticket.setReceipt(rs.getBytes("receipt"));
+                ticket.setPaymentId(rs.getString("payment_id"));
+
+                User issuer = new User();
+                issuer.setId(rs.getString("author_id"));
+                ticket.setIssuer(issuer);
+
+                // Deal with getting the resolver better; not really handled atm
+                rs.getString("resolver_id");
+                User resolver = new User();
+                ticket.setResolver(resolver);
+
                 ticket.setStatus(TicketStatus.PENDING);
                 ticket.setType(TicketType.valueOf(rs.getString("type_id")));
 
@@ -102,7 +155,10 @@ public class TicketDao implements CrudDao<TicketStub> {
 
             ps.setString(1, userId);
             ps.setString(2, ticketId);
-            ps.executeUpdate();
+            int result = ps.executeUpdate();
+            if (result == 0) {
+                throw new AttemptUpdatingFinalizedTicketException();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -120,7 +176,11 @@ public class TicketDao implements CrudDao<TicketStub> {
 
             ps.setString(1, userId);
             ps.setString(2, ticketId);
-            ps.executeUpdate();
+
+            int result = ps.executeUpdate();
+            if (result == 0) {
+                throw new AttemptUpdatingFinalizedTicketException();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

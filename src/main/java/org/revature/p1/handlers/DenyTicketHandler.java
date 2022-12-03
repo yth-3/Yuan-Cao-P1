@@ -6,6 +6,7 @@ import org.revature.p1.dtos.requests.JudgeTicketRequest;
 import org.revature.p1.services.TicketService;
 import org.revature.p1.services.TokenService;
 import org.revature.p1.utils.enums.ClientUserType;
+import org.revature.p1.utils.exceptions.AttemptUpdatingFinalizedTicketException;
 
 public class DenyTicketHandler {
     private ObjectMapper mapper;
@@ -30,6 +31,8 @@ public class DenyTicketHandler {
             JudgeTicketRequest req = mapper.readValue(ctx.req.getInputStream(), JudgeTicketRequest.class);
             ticketService.denyTicket(req, userId);
             ctx.status(200);
+        } catch (AttemptUpdatingFinalizedTicketException e) {
+            ctx.status(401);
         } catch (Exception e) {
             e.printStackTrace();
         }
