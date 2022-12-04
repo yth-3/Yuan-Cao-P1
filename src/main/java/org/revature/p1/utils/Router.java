@@ -41,6 +41,7 @@ public class Router {
 
         // User Ticket Management
         CreateTicketHandler createTicketHandler = new CreateTicketHandler(mapper, ticketService, tokenService);
+        GetTicketByStatusHandler getTicketByStatusHandler = new GetTicketByStatusHandler(mapper, ticketService, tokenService);
 
         // Manager Ticket Managment
         GetPendingTicketsHandler getPendingTicketsHandler = new GetPendingTicketsHandler(mapper, ticketService, tokenService);
@@ -68,6 +69,7 @@ public class Router {
             path("/tickets", () -> {
                 // Employee Ticket Management
                 post(createTicketHandler::createTicket);
+                get(getTicketByStatusHandler::getTicketsByStatus);
 
                 // Manager Ticket Management
                 get("/manager/pending", getPendingTicketsHandler::getPendingTickets);

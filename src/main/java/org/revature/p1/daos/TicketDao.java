@@ -93,7 +93,7 @@ public class TicketDao implements CrudDao<TicketStub> {
         return null;
     }
 
-    public List<Ticket> findAllPreviousTicketsByStatus(String userId, TicketStatus status) {
+    public List<Ticket> getAllPreviousTicketsByStatus(String userId, TicketStatus status) {
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
             PreparedStatement ps;
             if (status == null) {

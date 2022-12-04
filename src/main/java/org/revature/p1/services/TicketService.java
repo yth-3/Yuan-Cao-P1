@@ -3,6 +3,7 @@ package org.revature.p1.services;
 import org.revature.p1.daos.TicketDao;
 import org.revature.p1.dtos.requests.JudgeTicketRequest;
 import org.revature.p1.dtos.requests.TicketCreationRequest;
+import org.revature.p1.dtos.requests.TicketsByStatusRequest;
 import org.revature.p1.models.Ticket;
 import org.revature.p1.models.TicketStub;
 import org.revature.p1.utils.enums.TicketType;
@@ -33,5 +34,9 @@ public class TicketService {
 
     public void denyTicket(JudgeTicketRequest req, String userId) {
         ticketDao.denyTicket(req.getTicketId(), userId);
+    }
+
+    public List<Ticket> getAllPreviousTicketsByStatus(TicketsByStatusRequest req, String userId) {
+        return ticketDao.getAllPreviousTicketsByStatus(userId, req.getStatus());
     }
 }
