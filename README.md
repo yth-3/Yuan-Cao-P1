@@ -74,19 +74,19 @@
 		- IntelliJ IDEA
 
   - Database Connection
-		- JDBC
+    - JDBC
 
   - Networking
-		- Javalin
-		- Jackson
-		- JSON Web Tokens
+    - Javalin
+    - Jackson
+    - JSON Web Tokens
 
   - Testing
-		- JUnit
-		- Mockito
+    - JUnit
+    - Mockito
 
-	- Logging
-		- SLF4J (Simple Logging Facade for Java)
+  - Logging
+    - SLF4J (Simple Logging Facade for Java)
 
 - API/Functional Testing: Postman
 
