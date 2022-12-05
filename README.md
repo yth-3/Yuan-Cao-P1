@@ -45,6 +45,7 @@
 	- Stateless
 	- Cacheable
 
+![from https://restfulapi.net/richardson-maturity-model/](img/Richardson-Maturity-Model.jpg)
 
 ### WHY 3NF?
 
