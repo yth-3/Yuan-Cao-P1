@@ -5,8 +5,11 @@ import org.revature.p1.dtos.requests.JudgeTicketRequest;
 import org.revature.p1.dtos.requests.TicketCreationRequest;
 import org.revature.p1.dtos.requests.TicketsByStatusRequest;
 import org.revature.p1.models.Ticket;
-import org.revature.p1.models.TicketStub;
+import org.revature.p1.dtos.responses.TicketStub;
+import org.revature.p1.utils.enums.ClientUserType;
 import org.revature.p1.utils.enums.TicketType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -17,15 +20,12 @@ public class TicketService {
     public TicketService(TicketDao ticketDao) {
         this.ticketDao = ticketDao;
     }
+    private final static Logger logger = LoggerFactory.getLogger("UserService");
 
     public void createTicket(TicketCreationRequest req, String id) throws SQLException {
-        TicketStub ticketStub = new TicketStub(id, req.getAmount(), req.getDescription(), TicketType.valueOf(req.getType()));
+        TicketStub ticketStub = new TicketStub(id, req.getAmount(), req.getDescription(), TicketType.valueOf(req.getType().toUpperCase()));
         // Fill in info from req and id
-        this.ticketDao.create(ticketStub);
-    }
-
-    public List<Ticket> getAllTickets() {
-        return this.ticketDao.findAllPending();
+        this.ticketDao.createTicket(ticketStub);
     }
 
     public void approveTicket(JudgeTicketRequest req, String userId) {
@@ -36,7 +36,7 @@ public class TicketService {
         ticketDao.denyTicket(req.getTicketId(), userId);
     }
 
-    public List<Ticket> getAllPreviousTicketsByStatus(TicketsByStatusRequest req, String userId) {
-        return ticketDao.getAllPreviousTicketsByStatus(userId, req.getStatus());
+    public List<Ticket> getAllPreviousTicketsByStatus(TicketsByStatusRequest req, String userId, ClientUserType userType) {
+        return ticketDao.getAllPreviousTicketsByStatus(userId, req.getStatus(), userType);
     }
 }

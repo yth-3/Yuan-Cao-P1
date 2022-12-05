@@ -9,27 +9,23 @@ import org.revature.p1.dtos.responses.Principal;
 import org.revature.p1.models.User;
 import org.revature.p1.utils.exceptions.DuplicateUserException;
 import org.revature.p1.utils.exceptions.InvalidLoginException;
+import org.revature.p1.utils.exceptions.InvalidRegistrationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class UserService {
     private final UserDao userDao;
+    private final static Logger logger = LoggerFactory.getLogger("UserService");
 
     public UserService(UserDao userDao) {
         this.userDao = userDao;
     }
 
-    public Principal loginUser(LoginRequest req) {
-        User user = userDao.getUserById(req.getUsername(), req.getPassword());
-        if (user == null || !user.isActive()) { // TODO: Add more checks - e.g. see if out of authorized time period
-            throw new InvalidLoginException("Invalid username or password.");
-        }
-
-        return new Principal(user.getId(), user.getForename(), user.getRole(), user.isActive());
-    }
-
     public void registerUser(RegistrationRequest req) {
+        logger.info("... registering user ...");
         User user = new User();
         user.setUsername(req.getUsername());
         user.setPassword(req.getPassword());
@@ -40,30 +36,66 @@ public class UserService {
 
         if (isGoodCandidate(user)) {
             try {
-                userDao.create(user);
+                userDao.createUser(user);
             } catch (SQLException e) {
                 throw new DuplicateUserException();
             }
         }
     }
 
+    public Principal loginUser(LoginRequest req) {
+        logger.info("... logging in user ...");
+        User user = userDao.getUserById(req.getUsername(), req.getPassword());
+        if (user == null || !user.isActive()) {
+            throw new InvalidLoginException("Invalid username or password, or inactive account.");
+        }
+
+        return new Principal(user.getId(), user.getForename(), user.getRole(), user.isActive());
+    }
+
     public List<User> getAllUsers() {
-        return userDao.findAll();
+        logger.info("... getting all users ...");
+        return userDao.getAllUsers();
     }
 
     public void activateUser(AccountActivationRequest req) {
+        logger.info("... activating user ...");
         userDao.activateUser(req.getId());
     }
 
     public void deactivateUser(AccountDeactivationRequest req) {
+        logger.info("... deactivating user ...");
         userDao.deactivateUser(req.getId());
     }
 
     // Helper Functions
     private boolean isGoodCandidate(User user) {
-        // TODO: Implement more checks if there is time
         // TODO: Assess if need to refactor to an util class
+
+        if (user.getUsername() == null) {
+            throw new InvalidRegistrationException("missing username");
+        } else if (user.getEmail() == null) {
+            throw new InvalidRegistrationException("missing email");
+        } else if (user.getPassword() == null) {
+            throw new InvalidRegistrationException("missing password");
+        } else if (user.getForename() == null) {
+            throw new InvalidRegistrationException("missing forename");
+        } else if (user.getSurname() == null) {
+            throw new InvalidRegistrationException("missing surname");
+        } else if (user.getRole() == null) {
+            throw new InvalidRegistrationException("missing user role");
+        } else if (!isGoodPassword(user.getPassword())) {
+            throw new InvalidRegistrationException("missing strong password");
+        }
+
         return true;
     }
 
+    private boolean isGoodPassword(String password) {
+        if (password.length() < 12) {
+            return false;
+        }
+
+        return true;
+    }
 }

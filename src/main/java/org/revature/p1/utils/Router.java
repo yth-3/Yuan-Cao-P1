@@ -44,7 +44,6 @@ public class Router {
         GetTicketByStatusHandler getTicketByStatusHandler = new GetTicketByStatusHandler(mapper, ticketService, tokenService);
 
         // Manager Ticket Managment
-        GetPendingTicketsHandler getPendingTicketsHandler = new GetPendingTicketsHandler(mapper, ticketService, tokenService);
         ApproveTicketHandler approveTicketHandler = new ApproveTicketHandler(mapper, ticketService, tokenService);
         DenyTicketHandler denyTicketHandler = new DenyTicketHandler(mapper, ticketService, tokenService);
 
@@ -72,7 +71,7 @@ public class Router {
                 get(getTicketByStatusHandler::getTicketsByStatus);
 
                 // Manager Ticket Management
-                get("/manager/pending", getPendingTicketsHandler::getPendingTickets);
+//                get("/manager/pending", getPendingTicketsHandler::getPendingTickets);
                 put("/manager/approve", approveTicketHandler::approveTicket);
                 put("/manager/deny", denyTicketHandler::denyTicket);
             });

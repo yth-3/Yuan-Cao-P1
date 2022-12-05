@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class UserDao implements CrudDao<User> {
-    @Override
-    public void create(User obj) throws SQLException {
+public class UserDao {
+
+    public void createUser(User obj) throws SQLException {
         String uuidString = UUID.nameUUIDFromBytes((obj.getUsername() + obj.getPassword() + "DEADBEEF").getBytes()).toString();
         Connection con = ConnectionFactory.getInstance().getConnection();
         PreparedStatement ps = con.prepareStatement(
@@ -30,23 +30,7 @@ public class UserDao implements CrudDao<User> {
         ps.executeUpdate();
     }
 
-    @Override
-    public User read(User obj) {
-        return null;
-    }
-
-    @Override
-    public void update(User obj) {
-
-    }
-
-    @Override
-    public void delete(User obj) {
-
-    }
-
-    @Override
-    public List<User> findAll() {
+    public List<User> getAllUsers() {
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users WHERE role_id <> 'ADMIN'");
             ResultSet rs = ps.executeQuery();

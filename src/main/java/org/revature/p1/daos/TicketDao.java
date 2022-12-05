@@ -1,9 +1,10 @@
 package org.revature.p1.daos;
 
 import org.revature.p1.models.Ticket;
-import org.revature.p1.models.TicketStub;
+import org.revature.p1.dtos.responses.TicketStub;
 import org.revature.p1.models.User;
 import org.revature.p1.utils.ConnectionFactory;
+import org.revature.p1.utils.enums.ClientUserType;
 import org.revature.p1.utils.enums.TicketStatus;
 import org.revature.p1.utils.enums.TicketType;
 import org.revature.p1.utils.exceptions.AttemptUpdatingFinalizedTicketException;
@@ -13,16 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TicketDao implements CrudDao<TicketStub> {
-    @Override
-    public void create(TicketStub obj) throws SQLException{
+public class TicketDao {
+
+    public void createTicket(TicketStub obj) throws SQLException{
         Connection con = ConnectionFactory.getInstance().getConnection();
         PreparedStatement ps = con.prepareStatement(
                 "INSERT INTO ers_reimbursements (REIMB_ID, AMOUNT, SUBMITTED, DESCRIPTION, AUTHOR_ID, STATUS_ID, TYPE_ID) " +
                         "VALUES (?, ?, current_timestamp, ?, ?, 'PENDING', ?)"
         );
 
-        String uuidString = UUID.nameUUIDFromBytes((obj.getDescription() + obj.getSubmitterId() + "DEADBEEF").getBytes()).toString();
+        long now = System.currentTimeMillis();
+        String uuidString = UUID.nameUUIDFromBytes((obj.getSubmitterId() + Long.toString(now)).getBytes()).toString();
 
         ps.setString(1, uuidString); // need to generate id
         ps.setDouble(2, Double.valueOf(obj.getAmount()));
@@ -32,31 +34,32 @@ public class TicketDao implements CrudDao<TicketStub> {
         ps.executeUpdate();
     }
 
-    @Override
-    public TicketStub read(TicketStub obj) {
-        return null;
-    }
-
-    @Override
-    public void update(TicketStub obj) {
-
-    }
-
-    @Override
-    public void delete(TicketStub obj) {
-
-    }
-
-    @Override
-    public List<TicketStub> findAll() {
-        return null;
-    }
-
-    public List<Ticket> findAllPending() {
+    public List<Ticket> getAllPreviousTicketsByStatus(String userId, TicketStatus status, ClientUserType userType) {
         try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE status_id = 'PENDING';");
-            ResultSet rs = ps.executeQuery();
+            PreparedStatement ps = null;
+            if (userType == ClientUserType.MANAGER) {
+                if (status == null) {
+                    ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE resolver_id = ?");
+                    ps.setString(1, userId);
+                } else if (status == TicketStatus.PENDING) {
+                    ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE status_id = 'PENDING';");
+                } else {
+                    ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE resolver_id = ? AND status_id = ?");
+                    ps.setString(1, userId);
+                    ps.setString(2, status.toString());
+                }
+            } else if (userType == ClientUserType.EMPLOYEE) {
+                if (status == null) {
+                    ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE author_id = ?");
+                    ps.setString(1, userId);
+                } else {
+                    ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE author_id = ? AND status_id = ?");
+                    ps.setString(1, userId);
+                    ps.setString(2, status.toString());
+                }
+            }
 
+            ResultSet rs = ps.executeQuery();
             List<Ticket> tickets = new ArrayList<>();
             while (rs.next()) {
                 Ticket ticket = new Ticket();
@@ -81,57 +84,7 @@ public class TicketDao implements CrudDao<TicketStub> {
                 User resolver = new User();
                 ticket.setResolver(resolver);
 
-                ticket.setStatus(TicketStatus.PENDING);
-                ticket.setType(TicketType.valueOf(rs.getString("type_id")));
-
-                tickets.add(ticket);
-            }
-            return tickets;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public List<Ticket> getAllPreviousTicketsByStatus(String userId, TicketStatus status) {
-        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
-            PreparedStatement ps;
-            if (status == null) {
-                ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE author_id = ?");
-                ps.setString(1, userId);
-            } else {
-                ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE author_id = ? AND status_id = ?");
-                ps.setString(1, userId);
-                ps.setString(2, status.toString());
-            }
-
-            ResultSet rs = ps.executeQuery();
-
-            List<Ticket> tickets = new ArrayList<>();
-            while (rs.next()) {
-                Ticket ticket = new Ticket();
-
-                ticket.setId(rs.getString("reimb_id"));
-                ticket.setAmount(rs.getDouble("amount"));
-                ticket.setSubmitDate(rs.getTimestamp("submitted").getTime());
-
-                if (rs.getTimestamp("resolved") != null) {
-                    ticket.setResolveDate(rs.getTimestamp("resolved").getTime());
-                }
-                ticket.setDescription(rs.getString("description"));
-                ticket.setReceipt(rs.getBytes("receipt"));
-                ticket.setPaymentId(rs.getString("payment_id"));
-
-                User issuer = new User();
-                issuer.setId(rs.getString("author_id"));
-                ticket.setIssuer(issuer);
-
-                // Deal with getting the resolver better; not really handled atm
-                rs.getString("resolver_id");
-                User resolver = new User();
-                ticket.setResolver(resolver);
-
-                ticket.setStatus(TicketStatus.PENDING);
+                ticket.setStatus(TicketStatus.valueOf(rs.getString("status_id")));
                 ticket.setType(TicketType.valueOf(rs.getString("type_id")));
 
                 tickets.add(ticket);

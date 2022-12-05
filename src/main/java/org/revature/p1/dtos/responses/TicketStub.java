@@ -1,4 +1,4 @@
-package org.revature.p1.models;
+package org.revature.p1.dtos.responses;
 
 import org.revature.p1.utils.enums.TicketType;
 
