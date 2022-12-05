@@ -52,7 +52,7 @@
 - Adaptable to new applications
 - Relatively small foot print on disk given the information
 
-![ER Diagram](img/ERS Relational Model.png)
+![ER Diagram](img/"ERS Relational Model.png")
 
 - Each column is one attribute
 - Each row is one fact
