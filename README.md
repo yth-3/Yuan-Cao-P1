@@ -57,9 +57,9 @@
 - Each column is one attribute
 - Each row is one fact about the primary key
 - No partial dependency
-	- Each attribute depends on only a portion of the primary key
+	- No attribute depends on only a portion of the primary key
 - No transitive dependency
-	- Each attribute depends on another attribute that is not part of the primary key
+	- No attribute depends on another attribute that is not part of the primary key
 
 
 ### Technology Overview
