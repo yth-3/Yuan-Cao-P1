@@ -55,7 +55,7 @@
 ![ER Diagram](img/ERSRelationalModel.png)
 
 - Each column is one attribute
-- Each row is one fact
+- Each row is one fact about the primary key
 - No partial dependency
 	- Each attribute depends on only a portion of the primary key
 - No transitive dependency
@@ -76,16 +76,16 @@
   - Database Connection
 		- JDBC
 
-	- Networking
+  - Networking
 		- Javalin
 		- Jackson
 		- JSON Web Tokens
 
-	- Testing
+  - Testing
 		- JUnit
 		- Mockito
 
-	- Logging
+  - Logging
 		- SLF4J (Simple Logging Facade for Java)
 
 - API/Functional Testing: Postman
