@@ -59,6 +59,10 @@ public class CreateTicketHandler {
             ticketService.createTicket(req, principal.getId());
             logger.info("... accepted.");
             ctx.status(200);
+        } catch (RuntimeException e) {
+            logger.warn("... rejected, inactive user attempting to create a ticket.");
+            ctx.status(401);
+            ctx.result("Inactive employee cannot create a ticket.");
         } catch (Exception e) {
             logger.warn("... unexpected error encounter.");
             e.printStackTrace();

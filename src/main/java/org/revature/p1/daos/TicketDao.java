@@ -16,22 +16,30 @@ import java.util.UUID;
 
 public class TicketDao {
 
-    public void createTicket(TicketStub obj) throws SQLException{
+    public void createTicket(TicketStub obj) throws SQLException, RuntimeException {
         Connection con = ConnectionFactory.getInstance().getConnection();
-        PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO ers_reimbursements (REIMB_ID, AMOUNT, SUBMITTED, DESCRIPTION, AUTHOR_ID, STATUS_ID, TYPE_ID) " +
-                        "VALUES (?, ?, current_timestamp, ?, ?, 'PENDING', ?)"
-        );
 
-        long now = System.currentTimeMillis();
-        String uuidString = UUID.nameUUIDFromBytes((obj.getSubmitterId() + Long.toString(now)).getBytes()).toString();
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users WHERE user_id = ? AND is_active = true");
+        ps.setString(1, obj.getSubmitterId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            ps = con.prepareStatement(
+                    "INSERT INTO ers_reimbursements (REIMB_ID, AMOUNT, SUBMITTED, DESCRIPTION, AUTHOR_ID, STATUS_ID, TYPE_ID) " +
+                            "VALUES (?, ?, current_timestamp, ?, ?, 'PENDING', ?)"
+            );
 
-        ps.setString(1, uuidString); // need to generate id
-        ps.setDouble(2, Double.valueOf(obj.getAmount()));
-        ps.setString(3, obj.getDescription());
-        ps.setString(4, obj.getSubmitterId());
-        ps.setString(5, obj.getType().toString());
-        ps.executeUpdate();
+            long now = System.currentTimeMillis();
+            String uuidString = UUID.nameUUIDFromBytes((obj.getSubmitterId() + Long.toString(now)).getBytes()).toString();
+
+            ps.setString(1, uuidString); // need to generate id
+            ps.setDouble(2, Double.valueOf(obj.getAmount()));
+            ps.setString(3, obj.getDescription());
+            ps.setString(4, obj.getSubmitterId());
+            ps.setString(5, obj.getType().toString());
+            ps.executeUpdate();
+        } else {
+            throw new RuntimeException("Inactive employee attempting to create a ticket");
+        }
     }
 
     public List<Ticket> getAllPreviousTicketsByStatus(String userId, TicketStatus status, ClientUserType userType) {
