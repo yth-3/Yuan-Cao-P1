@@ -85,7 +85,7 @@
 		- JUnit
 		- Mockito
 
-  - Logging
+	- Logging
 		- SLF4J (Simple Logging Facade for Java)
 
 - API/Functional Testing: Postman
